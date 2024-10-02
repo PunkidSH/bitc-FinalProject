@@ -10,12 +10,12 @@ function tempComponent() {
     axios.get('http://localhost:8080/temp')
       .then(res => {
         setTempData(res.data);
-        console.log(tempData);
+        // console.log(tempData); // 콘솔로그사용시 무한렌더링 요청 발생
       })
       .catch(err => {
         alert("통신 실패." + err);
       });
-  }, [tempData]);
+  },[]);
 
   return (
     <div className={'container mt-5'}>
@@ -24,7 +24,6 @@ function tempComponent() {
       {tempData?.map(item => {
         return <TempItems key={item.id} data={item} />
       })}
-
     </div>
   );
 }

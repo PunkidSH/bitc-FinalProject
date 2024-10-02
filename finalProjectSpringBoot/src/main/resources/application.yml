@@ -31,5 +31,10 @@ spring:
     init:
       mode: always
 
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm
+    time-zone: UTC
+
 # 필요 시 업로드 file 경로
 #file.upload-dir= /~
