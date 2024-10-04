@@ -8,25 +8,45 @@ import bitc.fullstack405.finalprojectspringboot.service.TempService;
 import bitc.fullstack405.finalprojectspringboot.service.UserDetailsService;
 import bitc.fullstack405.finalprojectspringboot.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("http://localhost:5173")
-@RestController
-@RequestMapping("/")
+//@CrossOrigin("http://localhost:5173")
+@Controller
+@RequestMapping("/user")
 @RequiredArgsConstructor
-public class TempController {
+public class UserController {
 
-  private final TempService tempService;
   private final UserDetailsService userDetailsService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
-  private final UserRepository userRepository;
   private final UserService userService;
 
-  @GetMapping("/temp")
-  public List<TempEntity> temp() {
-    return tempService.findAll();
+  @GetMapping("/login")
+  public String login() {
+    return "/login";
+  }
+
+  @PostMapping("/signup")
+  public String signup(@RequestParam String userAccount, @RequestParam String userPw, @RequestParam String name, @RequestParam String userPhone) {
+
+    Role role = Role.ROLE_PRESIDENT;
+
+    String pwEncode = bCryptPasswordEncoder.encode(userPw);
+
+    UserEntity userEntity = UserEntity.builder()
+        .userAccount(userAccount)
+        .userPhone(userPhone)
+        .role(role)
+        .userPw(pwEncode)
+        .name(name)
+        .build();
+
+    userService.saveUser(userEntity);
+
+    return "redirect:/login";
   }
 }

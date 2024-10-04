@@ -2,7 +2,7 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import TempItems from "./TempItems.jsx";
 
-function tempComponent() {
+function TempComponent() {
 
   const [tempData, setTempData] = useState();
 
@@ -28,4 +28,4 @@ function tempComponent() {
   );
 }
 
-export default tempComponent;
+export default TempComponent;
