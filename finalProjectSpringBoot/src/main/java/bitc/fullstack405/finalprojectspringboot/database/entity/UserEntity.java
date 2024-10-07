@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -47,6 +48,9 @@ public class UserEntity implements UserDetails {
   // user 비밀번호
   @Column(name = "user_pw", length = 100, nullable = false)
   private String userPw;
+
+  @Column(name = "user_depart", length = 45, nullable = true)
+  private String userDepart;
 
 //  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //  @ToString.Exclude

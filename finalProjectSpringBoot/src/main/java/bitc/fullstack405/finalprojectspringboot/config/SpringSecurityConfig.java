@@ -12,20 +12,22 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-// 권한 : 협회장, 총무, 회원, 게스트(권한없음)
+// 권한 : 협회장, 총무, 정회원, 준회원(승인대기), 게스트(로그인 x, 권한없음)
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-  final UserDetailsService userDetailsService;
+  private final UserDetailsService userDetailsService;
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
@@ -37,25 +39,26 @@ public class SpringSecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
+//        .cors(cors -> cors.configurationSource(CorsConfig.corsConfigurationSource())) // 안먹는중
         .cors(cors -> cors.disable())
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/user/login", "/user/signup")
+            .requestMatchers("/user/login", "/user/signup", "/api/auth/signUp")
             .permitAll()
             .anyRequest().authenticated()
         )
-        .formLogin(login -> login
-            .loginPage("/user/login")
-            .failureUrl("/user/login")
-            .defaultSuccessUrl("http://localhost:5173/loginsuccess")
+        .formLogin(form -> form
             .usernameParameter("userAccount")
             .passwordParameter("userPw")
-            .permitAll()
         )
-        .sessionManagement(auth -> auth
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(true)
+        .exceptionHandling(except -> except
+              .authenticationEntryPoint(customAuthenticationEntryPoint) // 커스텀 로그인 페이지
+        )
+        .sessionManagement(manage -> manage
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt 토큰 방식이라 세션 생성 ㄴㄴ
         )
         .logout(Customizer.withDefaults());
+//        .addFilter(new Jwt);
+//        .addFilterBefore();
 
     return http.build();
   }
@@ -66,10 +69,10 @@ public class SpringSecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager() {
+  public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService); // service 구현 후 주석 해제
-    authProvider.setPasswordEncoder(passwordEncoder());
+    authProvider.setUserDetailsService(userDetailsService);
+    authProvider.setPasswordEncoder(passwordEncoder);
 
     return new ProviderManager(authProvider);
   }

@@ -36,5 +36,14 @@ spring:
     date-format: yyyy-MM-dd HH:mm
     time-zone: UTC
 
+  jwt:
+    secret=temp
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+
+
 # 필요 시 업로드 file 경로
 #file.upload-dir= /~
