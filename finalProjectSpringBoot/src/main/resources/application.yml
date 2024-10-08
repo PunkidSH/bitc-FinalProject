@@ -36,12 +36,13 @@ spring:
     date-format: yyyy-MM-dd HH:mm
     time-zone: UTC
 
-  jwt:
-    secret=temp
-
 logging:
   level:
     org.springframework.security: DEBUG
+
+jwt:
+  issuer: test
+  secret_key: test
 
 
 
