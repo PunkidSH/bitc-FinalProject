@@ -32,7 +32,7 @@ function App() {
           {/* 왼쪽 네비게이션 */}
           {/*<Navigation/>*/}
         {location.pathname !== '/login' && location.pathname !== '/signup' && <Navigation/>}
-          <div className={'container-fluid'} style={{marginLeft:"330px", marginRight:"50px"}}>
+          <div className={'container-fluid'} style={{marginLeft:"330px", marginRight:"50px", marginBottom:"100px"}}>
             {location.pathname !== '/login' && location.pathname !== '/signup' && <Header/>}
             {/*<Header/>*/}
             <MainPages>

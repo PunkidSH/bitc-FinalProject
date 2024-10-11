@@ -45,36 +45,6 @@ function EventList () {
   };
 
 
-  // 행사 진행상황 버튼 DB 정보에 따라 색상 다르게 출력(진행중 / 마감)
-  // 진행중 버튼은 클릭하면 마감으로 글자 변경되고 비활성화됨, 마감여부 DB에 전달
-  // 마감 조건 : 관리자가 직접 마감, 신청자 정원초과 자동 마감, 행사일 지나면 자동 마감
-
-  // const [status, setStatus] = useState('진행 중'); // 초기 상태
-  // const [loading, setLoading] = useState(true);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get('/api/status'); // 데이터 가져오기
-  //       setStatus(response.data.status); // 상태 업데이트
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //
-  //   fetchData();
-  // }, []);
-
-  const handleClick = () => {
-    if (eventData === '진행 중') {
-      setEventData('마감'); // 버튼 클릭 시 상태 변경
-    }
-  };
-
-  // if (loading) return <p>Loading...</p>; // 로딩 상태 처리
-
-
   return (
     <section>
       <Events/>
@@ -99,18 +69,6 @@ function EventList () {
 
             <div className={'col-2'}>
               <NavLink to={'/events/attend'} className={'btn w-100 btn-point'}>참석현황</NavLink>
-              <button type={'submit'} className={'btn w-100 mt-2'}
-                onClick={handleClick}
-                disabled={eventData === '마감'} // 상태에 따라 비활성화
-                style={{
-                  backgroundColor: eventData === '진행 중' ? 'gray' : 'gray',
-                  color: 'white',
-                  cursor: eventData === '마감' ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {item.deadline}
-              </button>{/* 진행 중 / 마감 */}
-
             </div>
           </div>
         </div>
