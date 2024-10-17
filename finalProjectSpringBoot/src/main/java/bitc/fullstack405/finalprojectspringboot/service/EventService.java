@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -206,48 +207,104 @@ public class EventService {
   }
 
 //  이벤트 상세보기
-  public Optional<EventEntity> eventView(Long eventId) {
-    return eventRepository.findById(eventId);
+public EventViewDTO eventView(Long eventId) {
+  EventEntity event = eventRepository.findById(eventId)
+      .orElseThrow(() -> new NoSuchElementException("Event not found"));
+
+  UserEntity uploader = event.getPosterUser();
+  ViewUserDTO uploaderDTO = ViewUserDTO.builder()
+      .name(uploader.getName())
+      .userId(uploader.getUserId())
+      .build();
+
+  UserEntity approver = event.getApprover();
+  ViewUserDTO approverDTO = null;
+
+  if (approver != null) {
+    approverDTO = ViewUserDTO.builder()
+        .userId(approver.getUserId())
+        .name(approver.getName())
+        .build();
   }
+
+  List<EventScheduleEntity> eventScheduleList = event.getScheduleList();
+  List<EventScheduleViewDTO> eventScheduleViewDTOList = new ArrayList<>();
+
+  for (EventScheduleEntity eventScheduleEntity : eventScheduleList) {
+    EventScheduleViewDTO eventScheduleViewDTO = EventScheduleViewDTO.builder()
+        .scheduleId(eventScheduleEntity.getScheduleId())
+        .eventDate(eventScheduleEntity.getEventDate())
+        .startTime(eventScheduleEntity.getStartTime())
+        .endTime(eventScheduleEntity.getEndTime())
+        .build();
+
+    eventScheduleViewDTOList.add(eventScheduleViewDTO);
+  }
+
+  EventViewDTO eventViewDTO = EventViewDTO.builder()
+      .eventId(event.getEventId())
+      .eventTitle(event.getEventTitle())
+      .eventContent(event.getEventContent())
+      .eventPoster(event.getEventPoster())
+      .eventAccept(event.getEventAccept())
+      .maxPeople(event.getMaxPeople())
+      .isRegistrationOpen(event.getIsRegistrationOpen())
+      .acceptedDate(event.getAcceptedDate())
+      .visibleDate(event.getVisibleDate())
+      .invisibleDate(event.getInvisibleDate())
+      .uploadDate(event.getUploadDate())
+      .eventSchedule(eventScheduleViewDTOList)
+      .posterUser(uploaderDTO)
+      .approver(approverDTO)
+      .build();
+
+  return eventViewDTO;
+}
 
 //  이벤트 리스트 전체 출력
-  public List<EventListDTO> getEventList() {
-    List<EventEntity> events = eventRepository.findAll();
-    List<EventListDTO> eventListDTO = new ArrayList<>();
+public List<EventListDTO> getEventList() {
+  List<EventEntity> events = eventRepository.findAllByOrderByEventIdDesc();
+  List<EventListDTO> eventListDTO = new ArrayList<>();
 
-    for (EventEntity event : events) {
-      List<EventScheduleEntity> schedules = eventScheduleRepository.findByEvent(event);
-      LocalDate startDate = schedules.get(0).getEventDate();
-      LocalDate endDate = schedules.get(schedules.size() - 1).getEventDate();
-      LocalTime startTime = schedules.get(0).getStartTime();
-      LocalTime endTime = schedules.get(0).getEndTime();
+  for (EventEntity event : events) {
+    List<EventScheduleEntity> schedules = eventScheduleRepository.findByEvent(event);
+    LocalDate startDate = schedules.get(0).getEventDate();
+    LocalDate endDate = schedules.get(schedules.size() - 1).getEventDate();
+    LocalTime startTime = schedules.get(0).getStartTime();
+    LocalTime endTime = schedules.get(0).getEndTime();
 
-      int appliedPeople = eventAppRepository.countByEventAndEventComp(event, 'N');
-      int completedPeople = eventAppRepository.countByEventAndEventComp(event, 'Y');
+    int appliedPeople = eventAppRepository.countByEventAndEventComp(event, 'N');
+    int completedPeople = eventAppRepository.countByEventAndEventComp(event, 'Y');
 
-      EventListDTO eventListDTO2 = EventListDTO.builder()
-          .eventPoster(event.getEventPoster())
-          .eventTitle(event.getEventTitle())
-          .uploadDate(LocalDate.from(event.getUploadDate()))
-          .maxPeople(event.getMaxPeople())
-          .eventAccept(event.getEventAccept())
-          .isRegistrationOpen(event.getIsRegistrationOpen())
-          .startDate(startDate)
-          .endDate(endDate)
-          .startTime(startTime)
-          .endTime(endTime)
-          .eventId(event.getEventId())
-          .totalAppliedPeople(appliedPeople + completedPeople)
-          .completedPeople(completedPeople)
-          .visibleDate(event.getVisibleDate())
-          .invisibleDate(event.getInvisibleDate())
-          .build();
+    String eventUploaderName = event.getPosterUser().getName();
 
-      eventListDTO.add(eventListDTO2);
-    }
+    String eventApproverName = event.getApprover() != null ? event.getApprover().getName() : "미승인";
 
-    return eventListDTO;
+    EventListDTO eventListDTO2 = EventListDTO.builder()
+        .eventPoster(event.getEventPoster())
+        .eventTitle(event.getEventTitle())
+        .uploadDate(LocalDate.from(event.getUploadDate()))
+        .maxPeople(event.getMaxPeople())
+        .eventAccept(event.getEventAccept())
+        .isRegistrationOpen(event.getIsRegistrationOpen())
+        .startDate(startDate)
+        .endDate(endDate)
+        .startTime(startTime)
+        .endTime(endTime)
+        .eventId(event.getEventId())
+        .totalAppliedPeople(appliedPeople + completedPeople)
+        .completedPeople(completedPeople)
+        .visibleDate(event.getVisibleDate())
+        .invisibleDate(event.getInvisibleDate())
+        .eventApproverName(eventApproverName) // approver name 추가
+        .eventUploaderName(eventUploaderName) // uploader name 추가
+        .build();
+
+    eventListDTO.add(eventListDTO2);
   }
+
+  return eventListDTO;
+}
 
 //  이벤트 참석자 정보 조회
   public AttendListDTO getAttendeeList(Long eventId) {
@@ -466,5 +523,30 @@ public class EventService {
         .build();
 
     eventRepository.save(endEvent);
+  }
+
+//  이벤트 승인 후 취소
+  @Transactional
+  public void acceptCancel(Long eventId) {
+    EventEntity event = eventRepository.findById(eventId).get();
+
+    EventEntity acceptCancelEvent = event.toBuilder()
+        .eventTitle(event.getEventTitle())
+        .eventContent(event.getEventContent())
+        .maxPeople(event.getMaxPeople())
+        .posterUser(event.getPosterUser())
+        .eventAccept(1)
+        .isRegistrationOpen(event.getIsRegistrationOpen())
+        .uploadDate(event.getUploadDate())
+        .acceptedDate(event.getAcceptedDate())
+        .approver(event.getApprover())
+        .eventAppList(event.getEventAppList())
+        .scheduleList(event.getScheduleList())
+        .eventPoster(event.getEventPoster())
+        .visibleDate(event.getVisibleDate())
+        .invisibleDate(event.getInvisibleDate())
+        .build();
+
+    eventRepository.save(acceptCancelEvent);
   }
 }

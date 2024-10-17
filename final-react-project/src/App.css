@@ -36,7 +36,7 @@
 }
 
 .btn {
-  border: 1px solid #ccc;
+  /*border: 1px solid #ccc;*/
   margin-right: 5px;
 }
 
@@ -102,13 +102,13 @@
 .table-custom {text-align: center;}
 
 .table-custom thead th {
-  padding: 15px 0;
+  padding: 13px 0;
   border-top:2px solid #555;
   border-bottom:1px solid #555;
 }
 
 .table-custom tbody td {
-  padding: 13px 0;
+  padding: 10px 0;
   vertical-align: middle;
 }
 
@@ -248,5 +248,30 @@
   background-color: #283eae;
   border-color: #283eae;
 }
+
+.endBtn {
+  min-width: 100px;
+  padding: 0.52rem 0.75rem;
+  color:#888;
+  border:1px solid #888;
+  background: #f5f5f5;
+}
+
+/*.button-disabled {*/
+/*  min-width: 100px;*/
+/*  padding: 0.52rem 0.75rem;*/
+/*  color:#888;*/
+/*  border:1px solid #888;*/
+/*  background: #f5f5f5;*/
+/*}*/
+
+
+
+
+
+
+
+
+
 
 

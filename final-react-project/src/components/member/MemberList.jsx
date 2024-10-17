@@ -10,7 +10,7 @@ function MemberList () {
   const [memberList, setMemberList] = useState([]);
   const [memberListData, setMemberListData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8); // 한 페이지당 항목 수
+  const [itemsPerPage] = useState(10); // 한 페이지당 항목 수
   const [selectedOption, setSelectedOption] = useState('all'); // 기본값 'all'
   const { userId } = useParams();
 
@@ -57,17 +57,19 @@ function MemberList () {
 
 
   // 회원탈퇴
-  const handleDelete = async (userId) => {
+  const handleDelete = async(userId) => {
     const confirmed = window.confirm('회원을 탈퇴처리 하시겠습니까?');
-    try {
+
+    if (confirmed) {
       await axios.delete(`http://localhost:8080/user/signOut/${userId}`);
       setMemberListData(memberListData.filter(item => item.userId !== userId));
       alert("회원이 삭제되었습니다.");
-    } catch (error) {
-      alert("삭제 중 오류가 발생했습니다.");
+    } else {
       // console.error("삭제 중 오류 발생:", error);
     }
   };
+
+
 
   // 승인여부
   const handleApproval = async(userId) => {
@@ -75,17 +77,16 @@ function MemberList () {
     //   return  alert("승인권한이 없습니다.")
     // }
 
-    const confirmed = window.confirm('승인 하시겠습니까?');
-    try {
+    const confirmed = window.confirm("승인 하시겠습니까?");
+
+    if (confirmed) {
       await axios.put(`http://localhost:8080/user/signAccept/${userId}`);
       setMemberListData(memberListData.filter(item => item.userId !== userId));
       alert("승인되었습니다.");
-    } catch (error) {
-      alert("승인 중 오류가 발생했습니다.");
+    } else {
       // console.error("승인 중 오류 발생:", error);
     }
   };
-
 
 
 

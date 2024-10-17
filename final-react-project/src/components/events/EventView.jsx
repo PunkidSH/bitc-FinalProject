@@ -2,8 +2,8 @@ import Events from "../../pages/Events.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import PresidentButton from "../common/PresidentButton.jsx";
-import SecretaryButton from "../common/SecretaryButton.jsx";
+import PresidentView from "../common/PresidentView.jsx";
+import SecretaryView from "../common/SecretaryView.jsx";
 
 
 
@@ -32,7 +32,7 @@ function EventView () {
     if (eventData && eventData.eventPoster) {
       return (
         <div>
-          <img src={`http://localhost:8080/eventImg/${eventData.eventPoster}`} alt="Poster" />
+          <img src={`http://localhost:8080/eventImg/${eventData.eventPoster}`} alt="Poster"  className={'mw-100'}/>
         </div>
       );
     }
@@ -98,25 +98,25 @@ function EventView () {
 
       {eventData ? (
         <div className={'form-border'}>
-          <div className={'py-4 border-bottom fs-5'}>
+          <div className={'py-3 border-bottom fs-5'}>
             {eventData.eventTitle || '제목 없음'}
           </div>
-          <div className={'d-flex py-4 border-bottom justify-content-between'}>
+          <div className={'d-flex py-3 border-bottom justify-content-between'}>
             <div className={'w-50'}>행사기간 <span className={'ms-3 fw-bold'}>{startDate || '미정'} ~ {endDate || '미정'}</span></div>
             <div className={'w-50'}>행사시간 <span className={'ms-3 fw-bold'}>{startTime || '미정'} ~ {endTime || '미정'}</span></div>
           </div>
 
-          <div className={'d-flex py-4 border-bottom justify-content-between'}>
+          <div className={'d-flex py-3 border-bottom justify-content-between'}>
             <div className={'w-50'}>모집시작일 <span className={'ms-3 fw-bold'}>{eventData.visibleDate || '미정'}</span></div>
             <div className={'w-50'}>인원수 <span className={'ms-3 fw-bold'}>{eventData.maxPeople || 0}명</span></div>
           </div>
 
-          <div className={'d-flex py-4 border-bottom justify-content-between'}>
+          <div className={'d-flex py-3 border-bottom justify-content-between'}>
             <div className={'w-50'}>작성일 <span className={'ms-3 fw-bold'}>{eventData.uploadDate || '미정'}</span></div>
             <div className={'w-50'}>작성자 <span className={'ms-3 me-2'}>{uploader || '알 수 없음'}</span></div>
           </div>
 
-          <div className={'d-flex py-4 border-bottom justify-content-between'}>
+          <div className={'d-flex py-3 border-bottom justify-content-between'}>
             <div className={'w-50'}>승인일자 <span className={'ms-3 fw-bold'}>{eventData.acceptedDate || '미정'}</span></div>
             <div className={'w-50'}>승인자 <span className={'ms-3 fw-bold'}>{approver?.name || '미정'}</span></div>
           </div>
@@ -129,11 +129,11 @@ function EventView () {
           {/* 협회장 / 총무 다른 button view */}
           {
             sessionStorage.getItem('permission') === '협회장' && (
-            <PresidentButton />
+            <PresidentView />
           )}
           {
             sessionStorage.getItem('permission') === '총무' && (
-            <SecretaryButton/>
+            <SecretaryView/>
           )}
         </div>
       ) : (
