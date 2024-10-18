@@ -20,12 +20,27 @@ function EventView () {
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [eventAccept, setEventAccept] = useState('');
+
+
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [uploader, setUploader] = useState('');
   const [prover, setProver] = useState('');
   // const [uploadDate, setUploadDate] = useState('');
   const uploadDate = new Date();
+
+  const formatDate = (uploadDate) => {
+    const year = uploadDate.getFullYear();
+    const month = String(uploadDate.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+    const day = String(uploadDate.getDate()).padStart(2, '0');
+    // const hours = String(uploadDate.getHours()).padStart(2, '0');
+    // const minutes = String(uploadDate.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+    // return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+
+
 
 
   // 이벤트 포스터를 표시하는 함수
@@ -51,9 +66,11 @@ function EventView () {
       .then((response) => {
         if (response.data) {
           setEventData(response.data);
+          setEventAccept(response.data);
           setScheduleList(response.data.eventSchedule || []);
           setUserData(response.data.posterUser || {});
           setApprover(response.data.approver || {});
+
         } else {
           setError("데이터를 찾을 수 없습니다.");
         }
@@ -101,14 +118,24 @@ function EventView () {
 
           <div className={'d-flex py-3 border-bottom justify-content-between'}>
             <div className={'w-50'}>작성일 <span
-              className={'ms-3 fw-bold'}>{new Date(eventData.uploadDate).toLocaleString() || '미정'}</span></div>
+              className={'ms-3 fw-bold'}>{formatDate(uploadDate).toLocaleString() || '미정'}</span></div>
             {/*<div className={'w-50'}>작성일 <span className={'ms-3 fw-bold'}>{eventData.uploadDate || ''}</span></div>*/}
-            <div className={'w-50'}>작성자 <span className={'ms-3 me-2'}>{uploader || ''}</span></div>
+            <div className={'w-50'}>작성자 <span className={'ms-3 me-2'}> {uploader}</span></div>
           </div>
 
           <div className={'d-flex py-3 border-bottom justify-content-between'}>
-            <div className={'w-50'}>승인일자 <span className={'ms-3 fw-bold'}>{eventData.acceptedDate || '미승인'}</span></div>
-            <div className={'w-50'}>승인자 <span className={'ms-3 fw-bold'}>{approver?.name || '미승인'}</span></div>
+            <div className={'w-50'}>승인일자 <span className={'ms-3 fw-bold'}>
+              {eventData.eventAccept === 1 && '미승인' ||
+                eventData.eventAccept === 2 && eventData.acceptedDate ||
+                eventData.eventAccept === 3 && '미승인'}
+              {/*{eventData.acceptedDate || '미승인'}*/}
+            </span></div>
+            <div className={'w-50'}>승인자 <span className={'ms-3 fw-bold'}>
+             {eventData.eventAccept === 1 && '미승인' ||
+               eventData.eventAccept === 2 && approver?.name ||
+               eventData.eventAccept === 3 && '미승인'}
+              {/*{approver?.name || '미승인'}*/}
+            </span></div>
           </div>
 
           <div className={'bg-light p-5 border-bottom'}>
