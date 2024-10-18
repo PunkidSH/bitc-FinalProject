@@ -7,18 +7,16 @@ import axios from "axios";
 function AcceptEventButton() {
   const [eventData, setEventData] = useState([]);
   const {eventId} = useParams();
-  const userId = sessionStorage.getItem("userId");
 
 
   // 행사 승인 버튼 (승인대기 / 승인완료)
-  const handleAcceptEvent = async(userId) => {
+  const handleAcceptEvent = async() => {
     const confirmed = window.confirm('행사 승인하시겠습니까?');
 
     if (confirmed) {
-      await axios.put(`http://localhost:8080/event/acceptEvent/${eventId}`, {
-        params: {
-          userId: userId
-        }
+      const userId = sessionStorage.getItem("userId");
+      await axios.put(`http://localhost:8080/event/acceptEvent/${eventId}`, null, {
+        params: { userId: userId }
       })
       setEventData(eventData.filter(eventData => eventData.eventId !== eventId));
       // setEventData(eventData.eventId);
