@@ -1,6 +1,7 @@
 import Events from "../../pages/Events.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 function EventWrite () {
 
@@ -14,39 +15,28 @@ function EventWrite () {
   let [maxPeople, setMaxPeople] = useState('');
   const [eventContent, setEventContent] = useState('');
 
-  // const writingHandler = (e) => {
-  //   e.preventDefault();
+
   //
-  //   if (eventEndDate < eventStartDate) {
-  //     alert('종료일이 시작일보다 빠를 수 없습니다.');
-  //   }
-  //   if (endTime < startTime) {
-  //     alert('종료시간이 시작시간보다 빠를 수 없습니다.');
-  //   }
+  // const [eventData, setEventData] = useState([]);
+  // const [error, setError] = useState(null);
+  // const { eventId } = useParams();
+  // // const { postId } = useParams();
+  // useEffect(() => {
+  //   const fetchPost = async () => {
+  //     if (eventId) { // postId가 있을 때만 수정 모드
+  //       try {
+  //         const response = await axios.get(`http://localhost:8080/event/updateEvent/${eventId}`);
+  //         setEventData(response.data);
+  //       } catch (err) {
+  //         setError('포스트를 불러오는 데 실패했습니다.');
+  //       }
+  //     }
+  //   };
   //
-  //   if (maxPeople == '') {
-  //     maxPeople = 0;
-  //   }
-  //   if (eventEndDate >= eventStartDate && endTime >= startTime) {
-  //     axios.post('http://localhost:8080/event/write', {
-  //       eventTitle: eventTitle,
-  //       eventContent: eventContent,
-  //       eventStartDate: eventStartDate,
-  //       eventEndDate: eventEndDate,
-  //       startTime: startTime,
-  //       endTime: endTime,
-  //       maxPeople: maxPeople,
-  //       userId: sessionStorage.getItem("userId"),
-  //       eventAccept: 1,
-  //     }).then(() => {
-  //       alert('등록에 성공했습니다. 협회장 승인을 기다려주세요.');
-  //       window.location.href = '/';
-  //     })
-  //       .catch(e => {
-  //         alert('등록 실패!\n'+ e.message + '\n관리자에게 문의하세요.');
-  //       });
-  //   }
-  // }
+  //   fetchPost();
+  // }, [eventId]);
+
+
 
   const writingHandler = (e) => {
     e.preventDefault();
@@ -95,6 +85,8 @@ function EventWrite () {
         });
     }
   }
+
+
 
   const getTodayDate = () => {
     const today = new Date();
