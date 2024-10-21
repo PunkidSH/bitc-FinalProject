@@ -29,7 +29,6 @@ import com.fullstack405.bitcfinalprojectkotlin.databinding.ActivityEventDetailBi
 import com.fullstack405.bitcfinalprojectkotlin.databinding.DialogAdduserBinding
 import com.fullstack405.bitcfinalprojectkotlin.databinding.DialogQrInfoBinding
 import com.fullstack405.bitcfinalprojectkotlin.templete.QR.CustomCaptureActivity
-import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Response
 import java.text.SimpleDateFormat
@@ -142,7 +141,7 @@ class EventDetailActivity : AppCompatActivity() {
         val today = dateFormat.format(cal.time)
 
         lateinit var event:EventDetailData
-        val url = "http://10.100.105.205:8080/eventImg/"
+        val url = "http://10.100.105.168:8080/eventImg/"
 //        var posterName = event.eventPoster
         
 //        이벤트id로 해당 이벤트 정보만 불러오기
