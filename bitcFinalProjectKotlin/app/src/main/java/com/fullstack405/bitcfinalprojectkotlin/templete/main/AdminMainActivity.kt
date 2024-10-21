@@ -1,6 +1,7 @@
 package com.fullstack405.bitcfinalprojectkotlin.templete.main
 
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -22,8 +23,11 @@ import com.fullstack405.bitcfinalprojectkotlin.templete.attend.AttendListActivit
 import com.fullstack405.bitcfinalprojectkotlin.templete.event.EventDetailActivity
 import com.fullstack405.bitcfinalprojectkotlin.templete.event.EventListActivity
 import com.fullstack405.bitcfinalprojectkotlin.templete.login.LoginActivity
+import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class AdminMainActivity : AppCompatActivity() {
     lateinit var binding: ActivityAdminMainBinding
@@ -43,6 +47,9 @@ class AdminMainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        subToTopic("notice") // 알람 구독
+
         userId = intent.getLongExtra("userId",0)
         userName = intent.getStringExtra("userName")!!
         userPermission = intent.getStringExtra("userPermission")!!
@@ -204,16 +211,29 @@ class AdminMainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<EventListData>>, response: Response<List<EventListData>>) {
                 eventList.clear()
 
-                var resList = response.body() as MutableList<EventListData>?
+                val resList = response.body() as MutableList<EventListData>? // 전체 리스트 저장
+                val resList2 = mutableListOf<EventListData>() // visible 행사만 저장할 데이터 초기화
 
-                // 목록은 항상 내림차순으로 받아옴, 상위 5개만 메인에 표출
-                if(resList!!.size-1 < 3){ // 5개 미만일 경우
-                    for(i in 0..resList.size-1){
-                        eventList.add(resList[i])
+                val cal = Calendar.getInstance()
+                cal.time = Date() // 오늘 날짜
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+                val today = dateFormat.format(cal.time)
+
+                if (resList != null) {
+                    for(item in resList){
+                        if(item.visibleDate <= today){
+                            resList2.add(item) // visible 행사만 저장
+                        }
+                    }
+                }
+                // 목록은 항상 내림차순으로 받아옴, 상위 3개만 메인에 표출
+                if(resList2!!.size-1 < 3){ // 3개 미만일 경우
+                    for(i in 0..resList2.size-1){
+                        eventList.add(resList2[i])
                     }
                 }else{
                     for(i in 0..2){
-                        eventList.add(resList[i])
+                        eventList.add(resList2[i])
                     }
                 }
 
@@ -230,6 +250,16 @@ class AdminMainActivity : AppCompatActivity() {
             }
         })
     }//findEventList
+    // 알람 구독
+    private fun subToTopic(topic:String){
+        FirebaseMessaging.getInstance().subscribeToTopic(topic)
+            .addOnCompleteListener { task ->
+                var msg = "Subscribed to topic"
+                if (!task.isSuccessful) {
+                    msg = "Subscription failed"
+                }
+                Log.d("FCM", msg)
+            }
+    }
 
-
-}
+} //main
