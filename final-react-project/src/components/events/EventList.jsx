@@ -19,7 +19,7 @@ function EventList() {
   const [approverSearchTerm, setApproverSearchTerm] = useState('');
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setHours(9, 0, 0, 0);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -37,16 +37,27 @@ function EventList() {
         recruitmentStatus = '모집대기';
       }
       else if (item.eventAccept === 2) {
-        if (today >= new Date(item.visibleDate) && today <= new Date(item.invisibleDate)) {
-          recruitmentStatus = '모집중';
-        } else if (today < new Date(item.visibleDate)) {
-          recruitmentStatus = '모집대기';
-        } else if (today > new Date(item.invisibleDate) && today < new Date(item.startDate)) {
-          recruitmentStatus = '행사대기';
-        } else if (today >= new Date(item.startDate) && today <= new Date(item.endDate)) {
-          recruitmentStatus = '행사중';
-        } else {
-          recruitmentStatus = '행사종료';
+        if (item.isRegistrationOpen === 'Y') {
+          if (today >= new Date(item.visibleDate) && today <= new Date(item.invisibleDate)) {
+            recruitmentStatus = '모집중';
+          }
+          else if (today >= new Date(item.startDate) && today <= new Date(item.endDate)) {
+            recruitmentStatus = '행사중';
+          }
+        }
+        else if (item.isRegistrationOpen === 'N') {
+          if (today < new Date(item.visibleDate)) {
+            recruitmentStatus = '모집대기';
+          }
+          else if (today > new Date(item.visibleDate) && today < new Date(item.startDate)) {
+            recruitmentStatus = '행사대기';
+          }
+          else if (today >= new Date(item.startDate) && today <= new Date(item.endDate)) {
+            recruitmentStatus = '행사중';
+          }
+          else {
+            recruitmentStatus = '행사종료';
+          }
         }
       }
 
@@ -184,21 +195,37 @@ function EventList() {
             recruitmentStatus = '모집대기';
           }
           else if (item.eventAccept === 2) {
-            if (today >= visibleDate && today <= invisibleDate) {
-              recruitmentStatus = '모집중';
+            if (item.isRegistrationOpen === 'Y') {
+              if (today >= visibleDate && today <= invisibleDate) {
+                recruitmentStatus = '모집중';
+              }
+              else if (today >= startDate && today <= endDate) {
+                recruitmentStatus = '행사중';
+              }
+              else {
+                recruitmentStatus = '예외발견1'
+              }
             }
-            else if (today < visibleDate) {
-              recruitmentStatus = '모집대기';
+            else if (item.isRegistrationOpen === 'N') {
+              if (today < visibleDate) {
+                recruitmentStatus = '모집대기';
+              }
+              else if (today > visibleDate && today < startDate) {
+                recruitmentStatus = '행사대기';
+              }
+              else if (today >= startDate && today <= endDate) {
+                recruitmentStatus = '행사중';
+              }
+              else if (today > endDate ) {
+                recruitmentStatus = '행사종료';
+              }
+              else {
+                recruitmentStatus = '예외발견2';
+              }
             }
-            else if (today > invisibleDate && today < startDate) {
-              recruitmentStatus = '행사대기';
-            }
-            else if (today >= startDate && today <= endDate) {
-              recruitmentStatus = '행사중';
-            }
-            else {
-              recruitmentStatus = '행사종료';
-            }
+          }
+          else {
+            recruitmentStatus = '예외발견3';
           }
           return (
             <div key={item.eventId} className={'d-flex justify-content-between align-items-center pb-5'}>
