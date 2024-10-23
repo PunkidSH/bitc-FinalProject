@@ -36,14 +36,14 @@ function EventList() {
       else if (item.eventAccept === 1) {
         recruitmentStatus = '모집대기';
       }
-      else if (item.eventAccept === 2) {
+      else if (item.eventAccept === 2 && item.isRegistrationOpen === 'Y') {
         if (today >= new Date(item.visibleDate) && today <= new Date(item.invisibleDate)) {
           recruitmentStatus = '모집중';
         }
         else if (today < new Date(item.visibleDate)) {
           recruitmentStatus = '모집대기';
         }
-        else if (today > new Date(item.invisibleDate) && today < new Date(item.startDate)) {
+        else if (today >= new Date(item.invisibleDate) && today < new Date(item.startDate)) {
           recruitmentStatus = '행사대기';
         }
         else if (today >= new Date(item.startDate) && today <= new Date(item.endDate)) {
@@ -57,7 +57,7 @@ function EventList() {
         if (today < new Date(item.visibleDate)) {
           recruitmentStatus = '모집대기';
         }
-        else if (today > new Date(item.invisibleDate) && today < new Date(item.startDate)) {
+        else if (today < new Date(item.startDate)) {
           recruitmentStatus = '행사대기';
         }
         else if (today >= new Date(item.startDate) && today <= new Date(item.endDate)) {
@@ -194,21 +194,21 @@ function EventList() {
             else if (today< visibleDate) {
               recruitmentStatus = '모집대기';
             }
-            else if (today > invisibleDate && today < startDate) {
-              recruitmentStatus = '행사대기';
-            }
-            else if (today >= startDate && today <= endDate) {
-              recruitmentStatus = '행사중';
-            }
-            else {
-              recruitmentStatus = '행사종료';
-            }
+            // else if (today >= invisibleDate && today < startDate) {
+            //   recruitmentStatus = '행사대기';
+            // }
+            // else if (today >= startDate && today <= endDate) {
+            //   recruitmentStatus = '행사중';
+            // }
+            // else {
+            //   recruitmentStatus = '행사종료';
+            // }
           }
           else if (item.eventAccept === 2 && item.isRegistrationOpen === 'N') {
-            if (today< visibleDate) {
-              recruitmentStatus = '모집대기';
-            }
-            else if (today > invisibleDate && today < startDate) {
+            // if (today< visibleDate) {
+            //   recruitmentStatus = '모집대기';
+            // }
+            if (today < startDate) {
               recruitmentStatus = '행사대기';
             }
             else if (today >= startDate && today <= endDate) {
